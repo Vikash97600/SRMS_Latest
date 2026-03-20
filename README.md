@@ -24,13 +24,14 @@ This system provides a **centralized digital platform** for:
 
 ## 📸 Screenshots
 
-> *(Add your screenshots here for better presentation)*
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
 
-```
-/screenshots/dashboard.png
-/screenshots/login.png
-/screenshots/chatbot.png
-```
+### Login Page
+![Login](screenshots/login.png)
+
+### AI Chatbot
+![Chatbot](screenshots/chatbot.png)
 
 ---
 
@@ -159,11 +160,11 @@ python manage.py runserver
 
 ## 🔐 Default Credentials (Optional)
 
-| Role    | Email                                         | Password |
-| ------- | --------------------------------------------- | -------- |
-| Admin   | [admin@gmail.com](mailto:admin@gmail.com)     | admin    |
-| Staff   | [staff@gmail.com](mailto:staff@gmail.com)     | staff    |
-| Student | [student@gmail.com](mailto:student@gmail.com) | student  |
+| Role    | Email                                         | Password      |
+| ------- | --------------------------------------------- | ------------- |
+| Admin   | [admin@gmail.com](mailto:admin@gmail.com)     | admin@97600   |
+| Staff   | [shweta@gmail.com](mailto:shweta@gmail.com)   | shweta        |
+| Student | [vikash@gmail.com](mailto:vikash@gmail.com)   | vikash@97600  |
 
 ---
 
