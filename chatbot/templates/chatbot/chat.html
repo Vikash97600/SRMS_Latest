@@ -1,0 +1,807 @@
+{% extends 'hod_template/base_template.html' %}
+{% load static %}
+
+{% block page_title %}
+AI Chat Assistant
+{% endblock page_title %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row chat-container">
+            <div class="col-md-12">
+                <div class="card chat-card glass-form">
+                    <div class="card-header chat-header">
+                        <div class="chat-header-info">
+                            <div class="chat-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div>
+                                <h5 class="chat-title">AI Assistant</h5>
+                                <span class="chat-status">
+                                    <span class="status-dot"></span>
+                                    Online
+                                </span>
+                            </div>
+                        </div>
+                        <div class="chat-actions">
+                            <button class="btn btn-sm btn-outline-danger" id="clear-chat" title="Clear Chat">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body chat-messages" id="chat-messages">
+                        <!-- Welcome Message -->
+                        <div class="message bot-message fade-in">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-bubble">
+                                    <p>Hello! I'm your AI Assistant for the Student Record Management System. 🤖</p>
+                                    <p>I can help you with:</p>
+                                    <ul>
+                                        <li>Student information queries</li>
+                                        <li>Attendance statistics</li>
+                                        <li>Course and subject details</li>
+                                        <li>Staff information</li>
+                                        <li>Analytics and reports</li>
+                                    </ul>
+                                    <p><strong>Try asking me something like:</strong></p>
+                                    <p class="example-query">"Show all students"</p>
+                                    <p class="example-query">"What is the average attendance?"</p>
+                                    <p class="example-query">"Which subject has most students?"</p>
+                                </div>
+                                <span class="message-time">Just now</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer chat-input-area">
+                        <form id="chat-form" class="chat-input-form">
+                            <div class="input-group">
+                                <input type="text" 
+                                       id="chat-input" 
+                                       class="form-control chat-input" 
+                                       placeholder="Ask me anything about students, attendance, courses..."
+                                       autocomplete="off">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary send-btn">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                            <span>AI is thinking</span>
+                            <span class="dots">
+                                <span></span><span></span><span></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chart Modal -->
+<div class="modal fade" id="chartModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content glass-form">
+            <div class="modal-header">
+                <h5 class="modal-title">Analytics Chart</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <canvas id="analyticsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_css %}
+<style>
+    /* Chat Container */
+    .chat-container {
+        height: calc(100vh - 200px);
+        min-height: 500px;
+    }
+    
+    .chat-card {
+        height: calc(100vh - 250px);
+        min-height: 500px;
+        display: flex;
+        flex-direction: column;
+        border-radius: 1.5rem;
+        overflow: hidden;
+    }
+    
+    /* Chat Header */
+    .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: var(--theme-primary) !important;
+        border-bottom: none;
+    }
+    
+    .chat-header-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .chat-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: white;
+    }
+    
+    .chat-title {
+        color: white !important;
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .chat-status {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #10B981;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .chat-actions .btn {
+        color: white;
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .chat-actions .btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: white;
+    }
+    
+    /* Chat Messages */
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        background: var(--theme-bg-primary);
+    }
+    
+    .message {
+        display: flex;
+        gap: 1rem;
+        max-width: 85%;
+    }
+    
+    .message.user-message {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+    
+    .message.bot-message {
+        align-self: flex-start;
+    }
+    
+    .message-avatar {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+    
+    .user-message .message-avatar {
+        background: var(--theme-primary);
+        color: white;
+    }
+    
+    .bot-message .message-avatar {
+        background: var(--theme-bg-card);
+        border: 2px solid var(--theme-primary);
+        color: var(--theme-primary);
+    }
+    
+    .message-content {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .message-bubble {
+        padding: 1rem 1.25rem;
+        border-radius: 1rem;
+        line-height: 1.6;
+    }
+    
+    .user-message .message-bubble {
+        background: var(--theme-primary);
+        color: white;
+        border-bottom-right-radius: 0.25rem;
+    }
+    
+    .bot-message .message-bubble {
+        background: var(--theme-bg-card);
+        border: 1px solid var(--theme-border);
+        border-bottom-left-radius: 0.25rem;
+    }
+    
+    .bot-message .message-bubble ul {
+        margin: 0.5rem 0;
+        padding-left: 1.5rem;
+    }
+    
+    .bot-message .message-bubble li {
+        margin-bottom: 0.25rem;
+    }
+    
+    .example-query {
+        background: var(--theme-bg-primary);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-family: monospace;
+        font-size: 13px;
+        margin: 0.25rem 0;
+        color: var(--theme-primary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .example-query:hover {
+        background: var(--theme-primary);
+        color: white;
+    }
+    
+    .message-time {
+        font-size: 11px;
+        color: var(--theme-text-secondary);
+        padding: 0 0.5rem;
+    }
+    
+    .user-message .message-time {
+        text-align: right;
+    }
+    
+    /* Table Response */
+    .response-table {
+        width: 100%;
+        margin-top: 1rem;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+    
+    .response-table th {
+        background: var(--theme-primary);
+        color: white;
+        padding: 0.75rem;
+        text-align: left;
+    }
+    
+    .response-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--theme-border);
+        background: var(--theme-bg-card);
+    }
+    
+    .response-table tr:hover td {
+        background: var(--theme-table-hover);
+    }
+    
+    /* Stat Card Response */
+    .stat-card {
+        background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        text-align: center;
+        margin-top: 1rem;
+    }
+    
+    .stat-card .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    /* Chat Input */
+    .chat-input-area {
+        padding: 1rem 1.5rem;
+        background: var(--theme-bg-card);
+        border-top: 1px solid var(--theme-border);
+    }
+    
+    .chat-input-form {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .chat-input {
+        border-radius: 2rem;
+        padding: 0.75rem 1.25rem;
+        border: 2px solid var(--theme-border);
+        background: var(--theme-input-bg);
+        color: var(--theme-input-text);
+        transition: all 0.3s ease;
+    }
+    
+    .chat-input:focus {
+        border-color: var(--theme-primary);
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+    
+    .chat-input::placeholder {
+        color: var(--theme-input-placeholder);
+    }
+    
+    .send-btn {
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+    
+    /* Typing Indicator */
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        color: var(--theme-text-secondary);
+        font-size: 13px;
+    }
+    
+    .typing-indicator .dots {
+        display: flex;
+        gap: 3px;
+    }
+    
+    .typing-indicator .dots span {
+        width: 6px;
+        height: 6px;
+        background: var(--theme-text-secondary);
+        border-radius: 50%;
+        animation: bounce 1.4s infinite ease-in-out both;
+    }
+    
+    .typing-indicator .dots span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator .dots span:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes bounce {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
+    }
+    
+    /* Scrollbar */
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: var(--theme-scrollbar-thumb);
+        border-radius: 3px;
+    }
+    
+    /* Animations */
+    .fade-in {
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Chart Modal */
+    #chartModal .modal-content {
+        background: var(--theme-bg-card);
+    }
+    
+    #chartModal .modal-header {
+        border-bottom-color: var(--theme-border);
+    }
+    
+    #chartModal .modal-title {
+        color: var(--theme-text-primary);
+    }
+    
+    /* Error Message */
+    .error-message {
+        background: #FEE2E2 !important;
+        color: #991B1B !important;
+        border-color: #EF4444 !important;
+    }
+    
+    [data-theme="dark"] .error-message {
+        background: rgba(239, 68, 68, 0.2) !important;
+        color: #FCA5A5 !important;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .chat-container {
+            height: calc(100vh - 150px);
+        }
+        
+        .chat-card {
+            height: calc(100vh - 180px);
+            border-radius: 1rem;
+        }
+        
+        .message {
+            max-width: 95%;
+        }
+        
+        .chat-header {
+            padding: 0.75rem 1rem;
+        }
+        
+        .chat-messages {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block custom_js %}
+<!-- Chart.js -->
+<script src="{% static 'chart.js/Chart.min.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        const chatForm = $('#chat-form');
+        const chatInput = $('#chat-input');
+        const chatMessages = $('#chat-messages');
+        const typingIndicator = $('#typing-indicator');
+        const clearChatBtn = $('#clear-chat');
+        
+        let chartInstance = null;
+        
+        // Submit message on form submit
+        chatForm.on('submit', function(e) {
+            e.preventDefault();
+            const message = chatInput.val().trim();
+            if (message) {
+                sendMessage(message);
+            }
+        });
+        
+        // Send message function
+        function sendMessage(message) {
+            // Add user message to chat
+            addMessage(message, 'user');
+            chatInput.val('');
+            
+            // Show typing indicator
+            showTyping();
+            
+            // Send to API
+            $.ajax({
+                url: '{% url "chat_api" %}',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ message: message }),
+                success: function(response) {
+                    hideTyping();
+                    if (response.success) {
+                        addBotResponse(response.response, response.sql_query);
+                    } else {
+                        addBotResponse({
+                            type: 'error',
+                            message: response.error
+                        }, null);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideTyping();
+                    addBotResponse({
+                        type: 'error',
+                        message: 'Sorry, something went wrong. Please try again.'
+                    }, null);
+                }
+            });
+        }
+        
+        // Add user message to chat
+        function addMessage(text, sender) {
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const messageHtml = `
+                <div class="message ${sender}-message fade-in">
+                    <div class="message-avatar">
+                        <i class="fas fa-${sender === 'user' ? 'user' : 'robot'}"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <p>${text}</p>
+                        </div>
+                        <span class="message-time">${time}</span>
+                    </div>
+                </div>
+            `;
+            
+            chatMessages.append(messageHtml);
+            scrollToBottom();
+        }
+        
+        // Add bot response to chat
+        function addBotResponse(response, sqlQuery) {
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Handle null/undefined response
+            if (!response) {
+                response = {
+                    type: 'error',
+                    message: "Sorry, I couldn't process that query. Please try again.",
+                    suggestion: 'Try simpler queries like: "list courses", "student count", or "show students"'
+                };
+            }
+            
+            let contentHtml = '';
+            
+            // Handle error type with null safety
+            if (response.type === 'error') {
+                contentHtml = `
+                    <div class="message-bubble error-message">
+                        <p><i class="fas fa-exclamation-circle mr-2"></i>${response.message || 'An error occurred'}</p>
+                        ${response.suggestion ? `<p class="mt-2"><em>${response.suggestion}</em></p>` : ''}
+                    </div>
+                `;
+            } else if (response.type === 'stat') {
+                // Handle null/undefined value for stat
+                const statValue = response.value !== null && response.value !== undefined ? response.value : 'N/A';
+                contentHtml = `
+                    <div class="message-bubble">
+                        <p>${response.message || 'Result:'}</p>
+                        <div class="stat-card">
+                            <div class="stat-value">${statValue}</div>
+                            <div class="stat-label">Result</div>
+                        </div>
+                    </div>
+                `;
+            } else if (response.type === 'table') {
+                // Handle null/undefined for table data
+                if (!response.data || !response.columns || response.data.length === 0) {
+                    contentHtml = `
+                        <div class="message-bubble">
+                            <p>No data found for your query.</p>
+                        </div>
+                    `;
+                } else {
+                    let tableHtml = '<table class="response-table"><thead><tr>';
+                    response.columns.forEach(col => {
+                        tableHtml += `<th>${col || 'Column'}</th>`;
+                    });
+                    tableHtml += '</tr></thead><tbody>';
+                    response.data.forEach(row => {
+                        tableHtml += '<tr>';
+                        response.columns.forEach(col => {
+                            const cellValue = row[col] !== null && row[col] !== undefined ? row[col] : 'N/A';
+                            tableHtml += `<td>${cellValue}</td>`;
+                        });
+                        tableHtml += '</tr>';
+                    });
+                    tableHtml += '</tbody></table>';
+                    
+                    contentHtml = `
+                        <div class="message-bubble">
+                            <p>${response.message || 'Results:'}</p>
+                            <div style="overflow-x: auto;">${tableHtml}</div>
+                        </div>
+                    `;
+                    
+                    // Check if we should show a chart
+                    if (response.data.length > 0 && response.data.length <= 10) {
+                        setTimeout(() => {
+                            showChartOption(response);
+                        }, 500);
+                    }
+                }
+            } else {
+                // Default text response - handle null/undefined
+                contentHtml = `
+                    <div class="message-bubble">
+                        <p>${response.message || 'I couldn\'t understand that query. Try: "list courses" or "student count"'}</p>
+                    </div>
+                `;
+            }
+            
+            // Add SQL query info if available
+            if (sqlQuery) {
+                contentHtml += `
+                    <div style="margin-top: 0.5rem; font-size: 11px; color: var(--theme-text-secondary);">
+                        <em>SQL: ${sqlQuery}</em>
+                    </div>
+                `;
+            }
+            
+            const botMessageHtml = `
+                <div class="message bot-message fade-in">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        ${contentHtml}
+                        <span class="message-time">${time}</span>
+                    </div>
+                </div>
+            `;
+            
+            chatMessages.append(botMessageHtml);
+            scrollToBottom();
+        }
+        
+        // Show typing indicator
+        function showTyping() {
+            typingIndicator.show();
+            scrollToBottom();
+        }
+        
+        // Hide typing indicator
+        function hideTyping() {
+            typingIndicator.hide();
+        }
+        
+        // Scroll to bottom of chat
+        function scrollToBottom() {
+            chatMessages.scrollTop(chatMessages[0].scrollHeight);
+        }
+        
+        // Show chart option
+        function showChartOption(response) {
+            const chartBtn = `
+                <button class="btn btn-sm btn-outline-primary mt-2 show-chart-btn" 
+                        data-columns='${JSON.stringify(response.columns)}'
+                        data-data='${JSON.stringify(response.data)}'>
+                    <i class="fas fa-chart-bar mr-1"></i> Show as Chart
+                </button>
+            `;
+            
+            // Add chart button to the last message
+            $('.message.bot-message:last-child .message-content').append(chartBtn);
+            
+            // Bind click event
+            $('.show-chart-btn').on('click', function() {
+                const columns = JSON.parse($(this).data('columns'));
+                const data = JSON.parse($(this).data('data'));
+                showChart(columns, data);
+            });
+        }
+        
+        // Show chart modal
+        function showChart(columns, data) {
+            const labels = data.map(row => Object.values(row)[0]);
+            const values = data.map(row => Object.values(row)[1]);
+            
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            
+            // Destroy previous chart if exists
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: columns[1],
+                        data: values,
+                        backgroundColor: [
+                            'rgba(79, 70, 229, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(239, 68, 68, 0.7)',
+                            'rgba(6, 182, 212, 0.7)',
+                            'rgba(139, 92, 246, 0.7)',
+                            'rgba(236, 72, 153, 0.7)',
+                            'rgba(99, 102, 241, 0.7)',
+                            'rgba(34, 197, 94, 0.7)',
+                            'rgba(249, 115, 22, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgb(79, 70, 229)',
+                            'rgb(16, 185, 129)',
+                            'rgb(245, 158, 11)',
+                            'rgb(239, 68, 68)',
+                            'rgb(6, 182, 212)',
+                            'rgb(139, 92, 246)',
+                            'rgb(236, 72, 153)',
+                            'rgb(99, 102, 241)',
+                            'rgb(34, 197, 94)',
+                            'rgb(249, 115, 22)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: columns[1],
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            $('#chartModal').modal('show');
+        }
+        
+        // Clear chat
+        clearChatBtn.on('click', function() {
+            if (confirm('Are you sure you want to clear the chat history?')) {
+                $.ajax({
+                    url: '{% url "clear_chat" %}',
+                    type: 'GET',
+                    success: function(response) {
+                        // Remove all messages except welcome
+                        chatMessages.find('.message').not(':first').remove();
+                    }
+                });
+            }
+        });
+        
+        // Click on example queries
+        $(document).on('click', '.example-query', function() {
+            const query = $(this).text();
+            chatInput.val(query);
+            chatInput.focus();
+        });
+    });
+</script>
+{% endblock %}

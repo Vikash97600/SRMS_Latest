@@ -1,0 +1,189 @@
+{% load static %}
+
+{% with current_url=request.resolver_match.url_name %}
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      <a href="{% url 'admin_home' %}" class="brand-link">
+        <img src="{% static 'dist/img/TIMSCDR.png' %}" alt="TIMSCDR Logo" class="brand-image img-circle elevation-3"
+            style="opacity: .8">
+        <span class="brand-text font-weight-light">TIMSCDR</span>
+      </a>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+          <div class="image">
+            <img src="{% static 'dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+          </div>
+          <div class="info">
+            <a href="{% url 'admin_profile' %}" class="d-block">{{ user.first_name }} {{ user.last_name }}</a>
+          </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Add icons to the links using the .nav-icon class
+                with font-awesome or any other icon font library -->
+
+            <li class="nav-item">
+              <a href="{% url 'admin_home' %}" class="nav-link {% if current_url == 'admin_home' %} active {% endif %}">
+                <i class="nav-icon fas fa-tachometer-alt"></i>
+                <p>
+                  Home
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'chat_view' %}" class="nav-link {% if current_url == 'chat_view' %} active {% endif %}">
+                <i class="nav-icon fas fa-robot"></i>
+                <p>
+                  AI Chat Assistant
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'manage_staff' %}" class="nav-link {% if current_url == 'manage_staff' or current_url == 'edit_staff' %} active {% endif %}">
+                <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                <p>
+                  Manage Staff
+                </p>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="{% url 'add_staff' %}" class="nav-link {% if current_url == 'add_staff' %} active {% endif %}">
+                <i class="nav-icon fas fa-user-plus"></i>
+                <p>
+                  Add Staff
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'manage_student' %}" class="nav-link {% if current_url == 'manage_student' or current_url == 'edit_student' %} active {% endif %}">
+                <i class="nav-icon fas fa-user-graduate"></i>
+                <p>
+                  Manage Student
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'add_student' %}" class="nav-link {% if current_url == 'add_student' %} active {% endif %}">
+                <i class="nav-icon fas fa-user-plus"></i>
+                <p>
+                  Add Student
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'manage_course' %}" class="nav-link {% if current_url == 'manage_course' or current_url == 'edit_course' %} active {% endif %}">
+                <i class="nav-icon fas fa-chalkboard"></i>
+                <p>
+                  Manage Course
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'add_course' %}" class="nav-link {% if current_url == 'add_course' %} active {% endif %}">
+                <i class="nav-icon fas fa-plus-circle"></i>
+                <p>
+                  Add Course
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'manage_subject' %}" class="nav-link {% if current_url == 'manage_subject' or current_url == 'edit_subject' %} active {% endif %}">
+                <i class="nav-icon fas fa-book"></i>
+                <p>
+                  Manage Subject
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'add_subject' %}" class="nav-link {% if current_url == 'add_subject' %} active {% endif %}">
+                <i class="nav-icon fas fa-plus-circle"></i>
+                <p>
+                  Add Subject
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'manage_session' %}" class="nav-link {% if current_url == 'manage_session' or current_url == 'edit_session' %} active {% endif %}">
+                <i class="nav-icon fas fa-graduation-cap"></i>
+                <p>
+                  Manage Session 
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'add_session' %}" class="nav-link {% if current_url == 'add_session' %} active {% endif %}">
+                <i class="nav-icon fas fa-plus-circle"></i>
+                <p>
+                  Add Session
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'admin_view_attendance' %}" class="nav-link {% if current_url == 'admin_view_attendance' %} active {% endif %}">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <p>
+                  View Attendance
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'student_feedback_message' %}" class="nav-link {% if current_url == 'student_feedback_message' %} active {% endif %}">
+                <i class="nav-icon fas fa-comments"></i>
+                <p>
+                  Student Feedback
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'staff_feedback_message' %}" class="nav-link {% if current_url == 'staff_feedback_message' %} active {% endif %}">
+                <i class="nav-icon fas fa-comments"></i>
+                <p>
+                  Staff Feedback
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'student_leave_view' %}" class="nav-link {% if current_url == 'student_leave_view' %} active {% endif %}">
+                <i class="nav-icon fas fa-plane-departure"></i>
+                <p>
+                  Student Leave
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="{% url 'staff_leave_view' %}" class="nav-link {% if current_url == 'staff_leave_view' %} active {% endif %}">
+                <i class="nav-icon fas fa-plane-departure"></i>
+                <p>
+                  Staff Leave
+                </p>
+              </a>
+            </li>
+
+          </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+      </div>
+      <!-- /.sidebar -->
+    </aside>
+{% endwith %}
